@@ -10,6 +10,9 @@ def main():
     print(f"Screen height: {SCREEN_HEIGHT}")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    clock = pygame.time.Clock()
+    dt = 0
+
     while True:
         log_state()
 
@@ -19,6 +22,10 @@ def main():
 
         screen.fill("black")
         pygame.display.flip()
+
+        # pause the game loop until 1/60th of a second has passed
+        dt = clock.tick(60) / 1000 # ms to second
+
 
 if __name__ == "__main__":
     main()
