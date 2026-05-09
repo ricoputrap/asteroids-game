@@ -3,6 +3,8 @@ import pygame
 from circleshape import CircleShape
 from constants import (
     LINE_WIDTH,
+    PLAYER_BLINK_RATE,
+    PLAYER_INVULNERABILITY_DURATION,
     PLAYER_RADIUS,
     PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SHOOT_SPEED,
@@ -17,6 +19,9 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.cooldown = 0
+        self.invulnerable: float = 0.0
+        self._blink_timer: float = 0.0
+        self._visible: bool = True
 
     def triangle(self) -> list[pygame.Vector2]:
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -27,12 +32,30 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen: pygame.Surface) -> None:
-        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+        if self._visible:
+            pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt
 
+    def respawn(self, x: float, y: float) -> None:
+        self.position = pygame.Vector2(x, y)
+        self.velocity = pygame.Vector2(0, 0)
+        self.rotation = 0
+        self.invulnerable = PLAYER_INVULNERABILITY_DURATION
+        self._blink_timer = PLAYER_BLINK_RATE
+        self._visible = True
+
     def update(self, dt: float) -> None:
+        if self.invulnerable > 0:
+            self.invulnerable -= dt
+            self._blink_timer -= dt
+            if self._blink_timer <= 0:
+                self._visible = not self._visible
+                self._blink_timer = PLAYER_BLINK_RATE
+            if self.invulnerable <= 0:
+                self._visible = True
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
