@@ -1,9 +1,21 @@
 [project]
 name = "asteroids-game"
 version = "0.1.0"
-description = "Add your description here"
+description = "A classic Asteroids clone built with pygame"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pygame==2.6.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
